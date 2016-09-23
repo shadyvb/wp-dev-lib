@@ -10,13 +10,22 @@ if [ -L "$0" ]; then
 	else
 		DEV_LIB_PATH=$( dirname $( readlink "$0" ) )
 	fi
-else
+elif [ -e "dev-lib" ]; then
 	DEV_LIB_PATH=dev-lib
+elif [ -e "bin/dev-lib" ]; then
+	DEV_LIB_PATH=bin/dev-lib
+elif [ -e ~/.wp-dev-lib ]; then
+    DEV_LIB_PATH=~/.wp-dev-lib
+else
+    # Clone to a shared directory if no other source is found
+    echo "Didn't find dev-lib anywhere near, cloning into home directory (~/.wp-dev-lib)"
+    git clone https://github.com/xwp/wp-dev-lib.git ~/.wp-dev-lib
+    DEV_LIB_PATH=~/.wp-dev-lib
 fi
 
 if [ ! -e "$DEV_LIB_PATH/check-diff.sh" ]; then
-	echo "Unable to determine DEV_LIB_PATH"
-	exit 1
+    echo "Couldn't find dev-lib anywhere, cannot proceed"
+    exit 1
 fi
 
 source "$DEV_LIB_PATH/check-diff.sh"
